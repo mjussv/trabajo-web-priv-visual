@@ -9,7 +9,9 @@ test:
 	docker compose up -d postgresql
 
 	# esperar a que se incie base de datos
-	sleep 15
+	@until docker exec postgres_container pg_isready -U postgres > /dev/null 2>&1; do \
+		sleep 1; \
+	done
 
 	# generar cod go (a partir de consultas sql)
 	sqlc generate 
