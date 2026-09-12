@@ -1,4 +1,4 @@
-# SEGUNDA ENTREGA:
+# Segunda Entrega:
 
 **Requisitos Previos:**
 
