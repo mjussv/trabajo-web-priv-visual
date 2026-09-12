@@ -1,4 +1,4 @@
-package db_test
+package db
 
 import (
 	"context"
@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
-	sqlc "trabajo-web/db/sqlc" // Si tu go.mod no se llama trabajo-web, cambialo acá
 )
 
 const (
@@ -27,14 +26,14 @@ func TestQueries_CRUD(t *testing.T) {
 		t.Fatalf("La base de datos no está respondiendo: %v", err)
 	}
 
-	// 2. Instanciar cliente generado por sqlc
-	queries := sqlc.New(db)
+	// 2. Instanciar cliente generado por sqlc (sin sqlc.)
+	queries := New(db)
 
 	var createdUserID int32
 
 	// Step 1: CrearUsuario
 	t.Run("CrearUsuario", func(t *testing.T) {
-		createdUser, err := queries.CrearUsuario(ctx, sqlc.CrearUsuarioParams{
+		createdUser, err := queries.CrearUsuario(ctx, CrearUsuarioParams{
 			Nombre: "John Doe",
 			Email:  "john.doe@example.com",
 		})
@@ -78,5 +77,7 @@ func TestQueries_CRUD(t *testing.T) {
 			t.Errorf("Se esperaba al menos 1 usuario en la lista")
 		}
 		t.Logf("All users: %+v", users)
+	})
+}
 	})
 }
