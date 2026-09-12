@@ -3,7 +3,9 @@ package db
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"testing"
+	"time"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
@@ -12,10 +14,9 @@ const (
 	connStr = "postgres://postgres:mysecretpassword@localhost:5432/outfits_db?sslmode=disable"
 )
 
-func TestQueries_CRUD(t *testing.T) {
+func TestSuiteCompleta(t *testing.T) {
 	ctx := context.Background()
 
-	// 1. Conexión a la db
 	db, err := sql.Open("pgx", connStr)
 	if err != nil {
 		t.Fatalf("Error al conectar a la base de datos: %v", err)
@@ -28,53 +29,105 @@ func TestQueries_CRUD(t *testing.T) {
 
 	queries := New(db)
 
-	var createdUserID int32
+	// se utiliza para generar correo electronico unico dinamicamente para evitar conflictos de duplicados 
+	uniqueEmail := fmt.Sprintf("testuser_%d@example.com", time.Now().UnixNano())
 
-	// CrearUsuario
-	t.Run("CrearUsuario", func(t *testing.T) {
-		createdUser, err := queries.CrearUsuario(ctx, CrearUsuarioParams{
-			Nombre: "John Doe",
-			Email:  "john.doe@example.com",
+	var usuarioID int32
+	var prendaID int32
+	var lookID int32
+
+	//TEST USUARIO
+	t.Run("Usuarios_CRUD", func(t *testing.T) {
+		user, err := queries.CrearUsuario(ctx, CrearUsuarioParams{
+			Nombre: "Jane Doe",
+			Email:  uniqueEmail,
 		})
 		if err != nil {
-			t.Fatalf("failed to create user: %v", err)
+			t.Fatalf("Error al crear usuario: %v", err)
 		}
+		usuarioID = user.ID
 
-		if createdUser.ID == 0 {
-			t.Errorf("Se esperaba un ID válido pero se obtuvo 0")
+		obtained, err := queries.ObtenerUsuario(ctx, usuarioID)
+		if err != nil || obtained.ID != usuarioID {
+			t.Fatalf("Error al obtener usuario: %v", err)
 		}
-
-		createdUserID = createdUser.ID
-		t.Logf("Created user: %+v", createdUser)
 	})
 
-	if createdUserID == 0 {
-		t.Fatal("Imposible continuar las pruebas CRUD sin un usuario creado")
-	}
-
-	//ObtenerUsuario 
-	t.Run("ObtenerUsuario", func(t *testing.T) {
-		user, err := queries.ObtenerUsuario(ctx, createdUserID)
+	//TEST PRENDAS
+	t.Run("Prendas_CRUD", func(t *testing.T) {
+		prenda, err := queries.CrearPrenda(ctx, CrearPrendaParams{
+			UsuarioID: usuarioID,
+			Nombre:    "Campera de Cuero",
+			Categoria: "Abrigos",
+		})
 		if err != nil {
-			t.Fatalf("failed to get user: %v", err)
+			t.Fatalf("Error al crear prenda: %v", err)
 		}
+		prendaID = prenda.ID
 
-		if user.ID != createdUserID {
-			t.Errorf("Se esperaba ID %d, pero se obtuvo %d", createdUserID, user.ID)
+		prendas, err := queries.ListarPrendasPorUsuario(ctx, usuarioID)
+		if err != nil || len(prendas) == 0 {
+			t.Fatalf("Error al listar prendas del usuario: %v", err)
 		}
-		t.Logf("Retrieved user: %+v", user)
 	})
 
-	//ListarUsuarios 
-	t.Run("ListarUsuarios", func(t *testing.T) {
-		users, err := queries.ListarUsuarios(ctx)
+	//  TEST LOOKS 
+	t.Run("Looks_CRUD", func(t *testing.T) {
+		look, err := queries.CrearLook(ctx, CrearLookParams{
+			UsuarioID:        usuarioID,
+			Nombre:           "Outfit Urbano Noche",
+			Descripcion:      sql.NullString{String: "Estilo casual chic ideal para salidas nocturnas.", Valid: true},
+			Ocasion:          "Noche",
+			Temporada:        "Otoño",
+			PrendaEstrellaID: sql.NullInt32{Int32: prendaID, Valid: true},
+			UrlImagen:        "https://example.com/outfit.jpg",
+			Estilo:           sql.NullString{String: "Urbano", Valid: true},
+		})
 		if err != nil {
-			t.Fatalf("failed to list users: %v", err)
+			t.Fatalf("Error al crear look: %v", err)
+		}
+		lookID = look.ID
+
+		detalle, err := queries.ObtenerLookConDetalle(ctx, lookID)
+		if err != nil || detalle.ID != lookID {
+			t.Fatalf("Error al obtener detalle del look: %v", err)
+		}
+	})
+
+	//TEST ME GUSTA
+	t.Run("MeGusta_Interaccion", func(t *testing.T) {
+		err := queries.DarMeGusta(ctx, DarMeGustaParams{
+			UsuarioID: usuarioID,
+			LookID:    lookID,
+		})
+		if err != nil {
+			t.Fatalf("Error al dar me gusta: %v", err)
 		}
 
-		if len(users) == 0 {
-			t.Errorf("Se esperaba al menos 1 usuario en la lista")
+		dioLike, err := queries.UsuarioLeDioMeGusta(ctx, UsuarioLeDioMeGustaParams{
+			UsuarioID: usuarioID,
+			LookID:    lookID,
+		})
+		if err != nil || !dioLike {
+			t.Fatalf("Se esperaba que el usuario le haya dado Me Gusta al look")
 		}
-		t.Logf("All users: %+v", users)
+
+		count, err := queries.ContarMeGustaPorLook(ctx, lookID)
+		if err != nil || count != 1 {
+			t.Fatalf("Se esperaba 1 Me Gusta registrado, obtenido: %d", count)
+		}
+	})
+
+	//TEST LIMPIAR CLÓSET
+	t.Run("LimpiarCloset", func(t *testing.T) {
+		err := queries.LimpiarClosetPorUsuario(ctx, usuarioID)
+		if err != nil {
+			t.Fatalf("Error al limpiar el clóset: %v", err)
+		}
+
+		prendas, err := queries.ListarPrendasPorUsuario(ctx, usuarioID)
+		if err != nil || len(prendas) != 0 {
+			t.Fatalf("Se esperaban 0 prendas tras limpiar el clóset")
+		}
 	})
 }
