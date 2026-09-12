@@ -8,7 +8,7 @@ Ejecución de Pruebas:
   La ejecución de los tests está completamente automatizada en el archivo Makefile.
 
 Comando de ejecución (desde terminal):
-  make test
+  "make test"
 
 A tener en cuenta: 
   Este proyecto implementa la capa de persistencia para una aplicación utilizando Go, PostgreSQL 16 y generación de código SQL seguro mediante sqlc
