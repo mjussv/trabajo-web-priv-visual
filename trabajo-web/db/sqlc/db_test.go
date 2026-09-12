@@ -15,7 +15,7 @@ const (
 func TestQueries_CRUD(t *testing.T) {
 	ctx := context.Background()
 
-	// 1. Conexión a la base de datos PostgreSQL
+	// 1. Conexión a la db
 	db, err := sql.Open("pgx", connStr)
 	if err != nil {
 		t.Fatalf("Error al conectar a la base de datos: %v", err)
@@ -26,12 +26,11 @@ func TestQueries_CRUD(t *testing.T) {
 		t.Fatalf("La base de datos no está respondiendo: %v", err)
 	}
 
-	// 2. Instanciar cliente generado por sqlc (sin sqlc.)
 	queries := New(db)
 
 	var createdUserID int32
 
-	// Step 1: CrearUsuario
+	// CrearUsuario
 	t.Run("CrearUsuario", func(t *testing.T) {
 		createdUser, err := queries.CrearUsuario(ctx, CrearUsuarioParams{
 			Nombre: "John Doe",
@@ -53,7 +52,7 @@ func TestQueries_CRUD(t *testing.T) {
 		t.Fatal("Imposible continuar las pruebas CRUD sin un usuario creado")
 	}
 
-	// Step 2: ObtenerUsuario (Read One)
+	//ObtenerUsuario 
 	t.Run("ObtenerUsuario", func(t *testing.T) {
 		user, err := queries.ObtenerUsuario(ctx, createdUserID)
 		if err != nil {
@@ -66,7 +65,7 @@ func TestQueries_CRUD(t *testing.T) {
 		t.Logf("Retrieved user: %+v", user)
 	})
 
-	// Step 3: ListarUsuarios (Read Many)
+	//ListarUsuarios 
 	t.Run("ListarUsuarios", func(t *testing.T) {
 		users, err := queries.ListarUsuarios(ctx)
 		if err != nil {
