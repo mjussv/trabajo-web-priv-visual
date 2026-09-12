@@ -2,15 +2,15 @@
 .PHONY: test
 
 test:
-	# limpia ejec ant 
+	# limpia ejec ant
 	docker compose down -v
 
-	# levanta postgres en 2do plano 
+	# levanta postgres en 2do plano
 	docker compose up -d postgresql
 
-	# esperar a que se incie base de datos
-	@until docker exec postgres_container pg_isready -U postgres > /dev/null 2>&1; do \
-		sleep 1; \
+	# espera activamente a que la base de datos outfits_db acepte conexiones
+	@until docker exec postgres_container pg_isready -U postgres -d outfits_db > /dev/null 2>&1; do \
+		sleep 2; \
 	done
 
 	# generar cod go (a partir de consultas sql)
