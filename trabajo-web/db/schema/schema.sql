@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS looks (
     id SERIAL PRIMARY KEY,
     usuario_id INT NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
     nombre VARCHAR(255) NOT NULL,
+    descripcion VARCHAR(500),
     ocasion VARCHAR(100) NOT NULL,
     temporada VARCHAR(100) NOT NULL,
     prenda_estrella_id INT REFERENCES prendas(id) ON DELETE SET NULL,
