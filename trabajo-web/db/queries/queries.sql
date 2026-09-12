@@ -67,7 +67,6 @@ RETURNING *;
 DELETE FROM looks WHERE id = $1;
 
 -- ===== ME GUSTA (like tipo Instagram) =====
-
 INSERT INTO me_gusta_looks (usuario_id, look_id) VALUES ($1, $2)
 ON CONFLICT DO NOTHING;
 
