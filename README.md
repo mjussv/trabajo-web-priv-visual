@@ -1,4 +1,4 @@
-SEGUNDA ENTREGA:
+# SEGUNDA ENTREGA:
 
 # Requisitos Previos
   Para ejecutar el proyecto y correr la suite de pruebas es necesario contar con las siguientes herramientas instaladas:
