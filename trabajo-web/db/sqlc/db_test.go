@@ -79,5 +79,3 @@ func TestQueries_CRUD(t *testing.T) {
 		t.Logf("All users: %+v", users)
 	})
 }
-	})
-}
