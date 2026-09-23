@@ -53,13 +53,13 @@ func (h *LooksHandler) List(w http.ResponseWriter, r *http.Request) {
 // GET /looks/{id}
 func (h *LooksHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	idStr := r.PathValue("id")
-	id, err := strconv.ParseInt(idStr, 10, 64)
+	id, err := strconv.ParseInt(idStr, 10, 32)
 	if err != nil {
 		http.Error(w, "ID inválido", http.StatusBadRequest)
 		return
 	}
 
-	looks, err := h.looksService.GetLooksByID(r.Context(), id)
+	looks, err := h.looksService.GetLooksByID(r.Context(), int32(id))
 	if err != nil {
 		http.Error(w, "Looks no encontrados", http.StatusNotFound)
 		return
@@ -72,13 +72,13 @@ func (h *LooksHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 // DELETE /looks/{id}
 func (h *LooksHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	idStr := r.PathValue("id")
-	id, err := strconv.ParseInt(idStr, 10, 64)
+	id, err := strconv.ParseInt(idStr, 10, 32)
 	if err != nil {
 		http.Error(w, "ID inválido", http.StatusBadRequest)
 		return
 	}
 
-	if err := h.looksService.DeleteLooks(r.Context(), id); err != nil {
+	if err := h.looksService.DeleteLooks(r.Context(), int32(id)); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
