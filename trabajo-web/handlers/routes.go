@@ -1,7 +1,5 @@
 package handlers
 
-package handlers
-
 import (
 	"net/http"
 )
