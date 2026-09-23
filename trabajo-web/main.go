@@ -18,7 +18,7 @@ func main() {
 	// 1. Obtener URL de conexión
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
-		dbURL = "postgres://postgres:postgres@localhost:5432/outfits_db?sslmode=disable"
+		dbURL = "postgres://postgres:mysecretpassword@localhost:5432/outfits_db?sslmode=disable"
 	}
 
 	// 2. Conectar a la base de datos
