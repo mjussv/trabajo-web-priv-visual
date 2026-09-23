@@ -26,15 +26,12 @@ func (h *MeGustaLooksHandler) AddMeGusta(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	meGusta, err := h.meGustaLooksService.AddMeGusta(r.Context(), req)
-	if err != nil {
+	if err := h.meGustaLooksService.AddMeGusta(r.Context(), req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(meGusta)
 }
 
 // DELETE /me-gusta
