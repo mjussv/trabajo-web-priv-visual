@@ -12,6 +12,7 @@ type Look struct {
 	ID               int32          `json:"id"`
 	UsuarioID        int32          `json:"usuario_id"`
 	Nombre           string         `json:"nombre"`
+	Descripcion      sql.NullString `json:"descripcion"`
 	Ocasion          string         `json:"ocasion"`
 	Temporada        string         `json:"temporada"`
 	PrendaEstrellaID sql.NullInt32  `json:"prenda_estrella_id"`

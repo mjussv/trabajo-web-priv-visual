@@ -13,18 +13,20 @@ import (
 const actualizarLook = `-- name: ActualizarLook :one
 UPDATE looks
 SET nombre = $2,
-    ocasion = $3,
-    temporada = $4,
-    prenda_estrella_id = $5,
-    url_imagen = $6,
-    estilo = $7
+    descripcion = $3,
+    ocasion = $4,
+    temporada = $5,
+    prenda_estrella_id = $6,
+    url_imagen = $7,
+    estilo = $8
 WHERE id = $1
-RETURNING id, usuario_id, nombre, ocasion, temporada, prenda_estrella_id, url_imagen, estilo, fecha_creacion
+RETURNING id, usuario_id, nombre, descripcion, ocasion, temporada, prenda_estrella_id, url_imagen, estilo, fecha_creacion
 `
 
 type ActualizarLookParams struct {
 	ID               int32          `json:"id"`
 	Nombre           string         `json:"nombre"`
+	Descripcion      sql.NullString `json:"descripcion"`
 	Ocasion          string         `json:"ocasion"`
 	Temporada        string         `json:"temporada"`
 	PrendaEstrellaID sql.NullInt32  `json:"prenda_estrella_id"`
@@ -36,6 +38,7 @@ func (q *Queries) ActualizarLook(ctx context.Context, arg ActualizarLookParams) 
 	row := q.db.QueryRowContext(ctx, actualizarLook,
 		arg.ID,
 		arg.Nombre,
+		arg.Descripcion,
 		arg.Ocasion,
 		arg.Temporada,
 		arg.PrendaEstrellaID,
@@ -47,6 +50,7 @@ func (q *Queries) ActualizarLook(ctx context.Context, arg ActualizarLookParams) 
 		&i.ID,
 		&i.UsuarioID,
 		&i.Nombre,
+		&i.Descripcion,
 		&i.Ocasion,
 		&i.Temporada,
 		&i.PrendaEstrellaID,
@@ -71,15 +75,16 @@ func (q *Queries) ContarMeGustaPorLook(ctx context.Context, lookID int32) (int64
 const crearLook = `-- name: CrearLook :one
 
 INSERT INTO looks (
-    usuario_id, nombre, ocasion, temporada, prenda_estrella_id, url_imagen, estilo
+    usuario_id, nombre, descripcion, ocasion, temporada, prenda_estrella_id, url_imagen, estilo
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7
-) RETURNING id, usuario_id, nombre, ocasion, temporada, prenda_estrella_id, url_imagen, estilo, fecha_creacion
+    $1, $2, $3, $4, $5, $6, $7, $8
+) RETURNING id, usuario_id, nombre, descripcion, ocasion, temporada, prenda_estrella_id, url_imagen, estilo, fecha_creacion
 `
 
 type CrearLookParams struct {
 	UsuarioID        int32          `json:"usuario_id"`
 	Nombre           string         `json:"nombre"`
+	Descripcion      sql.NullString `json:"descripcion"`
 	Ocasion          string         `json:"ocasion"`
 	Temporada        string         `json:"temporada"`
 	PrendaEstrellaID sql.NullInt32  `json:"prenda_estrella_id"`
@@ -92,6 +97,7 @@ func (q *Queries) CrearLook(ctx context.Context, arg CrearLookParams) (Look, err
 	row := q.db.QueryRowContext(ctx, crearLook,
 		arg.UsuarioID,
 		arg.Nombre,
+		arg.Descripcion,
 		arg.Ocasion,
 		arg.Temporada,
 		arg.PrendaEstrellaID,
@@ -103,6 +109,7 @@ func (q *Queries) CrearLook(ctx context.Context, arg CrearLookParams) (Look, err
 		&i.ID,
 		&i.UsuarioID,
 		&i.Nombre,
+		&i.Descripcion,
 		&i.Ocasion,
 		&i.Temporada,
 		&i.PrendaEstrellaID,
@@ -196,9 +203,18 @@ func (q *Queries) EliminarPrenda(ctx context.Context, id int32) error {
 	return err
 }
 
+const limpiarClosetPorUsuario = `-- name: LimpiarClosetPorUsuario :exec
+DELETE FROM prendas WHERE usuario_id = $1
+`
+
+func (q *Queries) LimpiarClosetPorUsuario(ctx context.Context, usuarioID int32) error {
+	_, err := q.db.ExecContext(ctx, limpiarClosetPorUsuario, usuarioID)
+	return err
+}
+
 const listarLooksConDetalle = `-- name: ListarLooksConDetalle :many
 SELECT
-    l.id, l.nombre, l.ocasion, l.temporada, l.url_imagen, l.estilo, l.fecha_creacion,
+    l.id, l.nombre, l.descripcion, l.ocasion, l.temporada, l.url_imagen, l.estilo, l.fecha_creacion,
     u.nombre AS autora,
     p.nombre AS prenda_estrella
 FROM looks l
@@ -210,6 +226,7 @@ ORDER BY l.fecha_creacion DESC
 type ListarLooksConDetalleRow struct {
 	ID             int32          `json:"id"`
 	Nombre         string         `json:"nombre"`
+	Descripcion    sql.NullString `json:"descripcion"`
 	Ocasion        string         `json:"ocasion"`
 	Temporada      string         `json:"temporada"`
 	UrlImagen      string         `json:"url_imagen"`
@@ -231,6 +248,7 @@ func (q *Queries) ListarLooksConDetalle(ctx context.Context) ([]ListarLooksConDe
 		if err := rows.Scan(
 			&i.ID,
 			&i.Nombre,
+			&i.Descripcion,
 			&i.Ocasion,
 			&i.Temporada,
 			&i.UrlImagen,
@@ -253,7 +271,7 @@ func (q *Queries) ListarLooksConDetalle(ctx context.Context) ([]ListarLooksConDe
 }
 
 const listarLooksPorOcasion = `-- name: ListarLooksPorOcasion :many
-SELECT id, usuario_id, nombre, ocasion, temporada, prenda_estrella_id, url_imagen, estilo, fecha_creacion FROM looks WHERE ocasion = $1 ORDER BY fecha_creacion DESC
+SELECT id, usuario_id, nombre, descripcion, ocasion, temporada, prenda_estrella_id, url_imagen, estilo, fecha_creacion FROM looks WHERE ocasion = $1 ORDER BY fecha_creacion DESC
 `
 
 func (q *Queries) ListarLooksPorOcasion(ctx context.Context, ocasion string) ([]Look, error) {
@@ -269,6 +287,7 @@ func (q *Queries) ListarLooksPorOcasion(ctx context.Context, ocasion string) ([]
 			&i.ID,
 			&i.UsuarioID,
 			&i.Nombre,
+			&i.Descripcion,
 			&i.Ocasion,
 			&i.Temporada,
 			&i.PrendaEstrellaID,
@@ -290,7 +309,7 @@ func (q *Queries) ListarLooksPorOcasion(ctx context.Context, ocasion string) ([]
 }
 
 const listarLooksPorPrenda = `-- name: ListarLooksPorPrenda :many
-SELECT l.id, l.usuario_id, l.nombre, l.ocasion, l.temporada, l.prenda_estrella_id, l.url_imagen, l.estilo, l.fecha_creacion
+SELECT l.id, l.usuario_id, l.nombre, l.descripcion, l.ocasion, l.temporada, l.prenda_estrella_id, l.url_imagen, l.estilo, l.fecha_creacion
 FROM looks l
 JOIN prendas p ON l.prenda_estrella_id = p.id
 WHERE p.nombre ILIKE '%' || $1 || '%'
@@ -310,6 +329,7 @@ func (q *Queries) ListarLooksPorPrenda(ctx context.Context, dollar_1 sql.NullStr
 			&i.ID,
 			&i.UsuarioID,
 			&i.Nombre,
+			&i.Descripcion,
 			&i.Ocasion,
 			&i.Temporada,
 			&i.PrendaEstrellaID,
@@ -332,7 +352,7 @@ func (q *Queries) ListarLooksPorPrenda(ctx context.Context, dollar_1 sql.NullStr
 
 const listarLooksPorUsuario = `-- name: ListarLooksPorUsuario :many
 SELECT
-    l.id, l.nombre, l.ocasion, l.temporada, l.url_imagen, l.estilo, l.fecha_creacion,
+    l.id, l.nombre, l.descripcion, l.ocasion, l.temporada, l.url_imagen, l.estilo, l.fecha_creacion,
     u.nombre AS autora,
     p.nombre AS prenda_estrella
 FROM looks l
@@ -345,6 +365,7 @@ ORDER BY l.fecha_creacion DESC
 type ListarLooksPorUsuarioRow struct {
 	ID             int32          `json:"id"`
 	Nombre         string         `json:"nombre"`
+	Descripcion    sql.NullString `json:"descripcion"`
 	Ocasion        string         `json:"ocasion"`
 	Temporada      string         `json:"temporada"`
 	UrlImagen      string         `json:"url_imagen"`
@@ -366,6 +387,7 @@ func (q *Queries) ListarLooksPorUsuario(ctx context.Context, usuarioID int32) ([
 		if err := rows.Scan(
 			&i.ID,
 			&i.Nombre,
+			&i.Descripcion,
 			&i.Ocasion,
 			&i.Temporada,
 			&i.UrlImagen,
@@ -454,7 +476,7 @@ func (q *Queries) ListarUsuarios(ctx context.Context) ([]Usuario, error) {
 
 const obtenerLookConDetalle = `-- name: ObtenerLookConDetalle :one
 SELECT
-    l.id, l.nombre, l.ocasion, l.temporada, l.url_imagen, l.estilo, l.fecha_creacion,
+    l.id, l.nombre, l.descripcion, l.ocasion, l.temporada, l.url_imagen, l.estilo, l.fecha_creacion,
     u.nombre AS autora,
     p.nombre AS prenda_estrella
 FROM looks l
@@ -466,6 +488,7 @@ WHERE l.id = $1
 type ObtenerLookConDetalleRow struct {
 	ID             int32          `json:"id"`
 	Nombre         string         `json:"nombre"`
+	Descripcion    sql.NullString `json:"descripcion"`
 	Ocasion        string         `json:"ocasion"`
 	Temporada      string         `json:"temporada"`
 	UrlImagen      string         `json:"url_imagen"`
@@ -481,6 +504,7 @@ func (q *Queries) ObtenerLookConDetalle(ctx context.Context, id int32) (ObtenerL
 	err := row.Scan(
 		&i.ID,
 		&i.Nombre,
+		&i.Descripcion,
 		&i.Ocasion,
 		&i.Temporada,
 		&i.UrlImagen,
