@@ -15,13 +15,13 @@ import (
 )
 
 func main() {
-	// 1. Obtener cadena de conexión
+	// 1. Obtener URL de conexión
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
 		dbURL = "postgres://postgres:postgres@localhost:5432/outfits_db?sslmode=disable"
 	}
 
-	// 2. Conectar a PostgreSQL con el driver pgx
+	// 2. Conectar a la base de datos
 	db, err := sql.Open("pgx", dbURL)
 	if err != nil {
 		log.Fatalf("Error configurando la base de datos: %v", err)
@@ -32,19 +32,25 @@ func main() {
 		log.Fatalf("No se pudo conectar a la base de datos: %v", err)
 	}
 
-	// 3. Inicializar sqlc Queries
+	// 3. Capa DB (sqlc)
 	queries := sqlc.New(db)
 
-	// 4. Inicializar Servicios de la Capa Logic
+	// 4. Capa Lógica (Services)
 	usuariosSvc := logic.NewUsuariosService(queries)
 	prendasSvc := logic.NewPrendasService(queries)
 	looksSvc := logic.NewLooksService(queries)
 	meGustaSvc := logic.NewMeGustaLooksService(queries)
 
-	// 5. Configurar Rutas
-	router := handlers.SetupRoutes(usuariosSvc, prendasSvc, looksSvc, meGustaSvc)
+	// 5. Capa HTTP (Handlers)
+	usuariosHdl := handlers.NewUsuariosHandler(usuariosSvc)
+	prendasHdl := handlers.NewPrendasHandler(prendasSvc)
+	looksHdl := handlers.NewLooksHandler(looksSvc)
+	meGustaHdl := handlers.NewMeGustaLooksHandler(meGustaSvc)
 
-	// 6. Iniciar Servidor HTTP
+	// 6. Configurar Rutas
+	router := handlers.SetupRoutes(usuariosHdl, prendasHdl, looksHdl, meGustaHdl)
+
+	// 7. Iniciar Servidor
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
