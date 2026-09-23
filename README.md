@@ -18,3 +18,6 @@
   Este proyecto implementa la capa de persistencia para una aplicación utilizando Go, PostgreSQL 16 y generación de código SQL seguro mediante sqlc.
   
   Si es la primera vez que se descarga sqlc el mismo puede bajarse en el bin de la carpeta "go", lo que podria generar errores; para solucionar esto, utilizar el siguiente comando: " echo 'export PATH=$PATH:~/go/bin'>> ~/.bashrc "
+
+grep -n -i "POSTGRES" docker-compose.yml
+grep -n "postgres://" main.go
