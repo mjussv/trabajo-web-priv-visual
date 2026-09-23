@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"strings"
 
@@ -21,7 +22,6 @@ func NewLooksService(queries *sqlc.Queries) *LooksService {
 type CreateLooksParams struct {
 	UsuarioID        int32  `json:"usuario_id"`
 	Nombre           string `json:"nombre"`
-	Descripcion      string `json:"descripcion"`
 	Ocasion          string `json:"ocasion"`
 	Temporada        string `json:"temporada"`
 	PrendaEstrellaID int32  `json:"prenda_estrella_id"`
@@ -35,14 +35,16 @@ func (s *LooksService) CreateLooks(ctx context.Context, params CreateLooksParams
 	}
 
 	return s.queries.CrearLook(ctx, sqlc.CrearLookParams{
-		UsuarioID:        params.UsuarioID,
-		Nombre:           params.Nombre,
-		Descripcion:      params.Descripcion,
-		Ocasion:          params.Ocasion,
-		Temporada:        params.Temporada,
-		PrendaEstrellaID: params.PrendaEstrellaID,
-		UrlImagen:        params.UrlImagen,
-		Estilo:           params.Estilo,
+		UsuarioID: params.UsuarioID,
+		Nombre:    params.Nombre,
+		Ocasion:   sql.NullString{String: params.Ocasion, Valid: params.Ocasion != ""},
+		Temporada: sql.NullString{String: params.Temporada, Valid: params.Temporada != ""},
+		PrendaEstrellaID: sql.NullInt32{
+			Int32: params.PrendaEstrellaID,
+			Valid: params.PrendaEstrellaID != 0,
+		},
+		UrlImagen: sql.NullString{String: params.UrlImagen, Valid: params.UrlImagen != ""},
+		Estilo:    sql.NullString{String: params.Estilo, Valid: params.Estilo != ""},
 	})
 }
 
