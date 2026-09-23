@@ -47,3 +47,23 @@ func (s *UsuariosService) GetUsuariosByID(ctx context.Context, id int32) (sqlc.U
 	}
 	return s.queries.ObtenerUsuario(ctx, id)
 }
+
+type UpdateUsuariosParams struct {
+	ID     int32  `json:"id"`
+	Nombre string `json:"nombre"`
+	Email  string `json:"email"`
+}
+
+func (s *UsuariosService) UpdateUsuarios(ctx context.Context, params UpdateUsuariosParams) (sqlc.Usuario, error) {
+	if params.ID <= 0 {
+		return sqlc.Usuario{}, errors.New("el ID de usuario debe ser mayor a 0")
+	}
+	if strings.TrimSpace(params.Nombre) == "" {
+		return sqlc.Usuario{}, errors.New("el nombre no puede estar vacío")
+	}
+
+	return s.queries.CrearUsuario(ctx, sqlc.CrearUsuarioParams{
+		Nombre: params.Nombre,
+		Email:  params.Email,
+	})
+}
