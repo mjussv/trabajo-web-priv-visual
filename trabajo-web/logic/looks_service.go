@@ -14,14 +14,13 @@ type LooksService struct {
 }
 
 func NewLooksService(queries *sqlc.Queries) *LooksService {
-	return &LooksService{
-		queries: queries,
-	}
+	return &LooksService{queries: queries}
 }
 
 type CreateLooksParams struct {
 	UsuarioID        int32  `json:"usuario_id"`
 	Nombre           string `json:"nombre"`
+	Descripcion      string `json:"descripcion"`
 	Ocasion          string `json:"ocasion"`
 	Temporada        string `json:"temporada"`
 	PrendaEstrellaID int32  `json:"prenda_estrella_id"`
@@ -33,19 +32,33 @@ func (s *LooksService) CreateLooks(ctx context.Context, params CreateLooksParams
 	if strings.TrimSpace(params.Nombre) == "" {
 		return sqlc.Look{}, errors.New("el nombre del look no puede estar vacío")
 	}
+	if strings.TrimSpace(params.Ocasion) == "" {
+		return sqlc.Look{}, errors.New("la ocasión no puede estar vacía")
+	}
+	if strings.TrimSpace(params.Temporada) == "" {
+		return sqlc.Look{}, errors.New("la temporada no puede estar vacía")
+	}
+	if strings.TrimSpace(params.UrlImagen) == "" {
+		return sqlc.Look{}, errors.New("la URL de la imagen no puede estar vacía")
+	}
 
 	return s.queries.CrearLook(ctx, sqlc.CrearLookParams{
-		UsuarioID: params.UsuarioID,
-		Nombre:    params.Nombre,
-		Ocasion:   sql.NullString{String: params.Ocasion, Valid: params.Ocasion != ""},
-		Temporada: sql.NullString{String: params.Temporada, Valid: params.Temporada != ""},
+		UsuarioID:   params.UsuarioID,
+		Nombre:      params.Nombre,
+		Descripcion: sql.NullString{String: params.Descripcion, Valid: params.Descripcion != ""},
+		Ocasion:     params.Ocasion,
+		Temporada:   params.Temporada,
 		PrendaEstrellaID: sql.NullInt32{
 			Int32: params.PrendaEstrellaID,
 			Valid: params.PrendaEstrellaID != 0,
 		},
-		UrlImagen: sql.NullString{String: params.UrlImagen, Valid: params.UrlImagen != ""},
+		UrlImagen: params.UrlImagen,
 		Estilo:    sql.NullString{String: params.Estilo, Valid: params.Estilo != ""},
 	})
+}
+
+func (s *LooksService) ListLooks(ctx context.Context) ([]sqlc.ListarLooksConDetalleRow, error) {
+	return s.queries.ListarLooksConDetalle(ctx)
 }
 
 func (s *LooksService) GetLooksByID(ctx context.Context, id int32) (sqlc.ObtenerLookConDetalleRow, error) {
