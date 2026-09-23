@@ -19,6 +19,7 @@ func NewPrendasService(queries *sqlc.Queries) *PrendasService {
 }
 
 type CreatePrendasParams struct {
+	UsuarioID int32  `json:"usuario_id"`
 	Nombre    string `json:"nombre"`
 	Categoria string `json:"categoria"`
 }
@@ -28,26 +29,27 @@ func (s *PrendasService) CreatePrendas(ctx context.Context, params CreatePrendas
 		return sqlc.Prenda{}, errors.New("el nombre de la prenda no puede estar vacío")
 	}
 
-	return s.queries.CreatePrenda(ctx, sqlc.CreatePrendaParams{
+	return s.queries.CrearPrenda(ctx, sqlc.CrearPrendaParams{
+		UsuarioID: params.UsuarioID,
 		Nombre:    params.Nombre,
 		Categoria: params.Categoria,
 	})
 }
 
-func (s *PrendasService) ListPrendas(ctx context.Context) ([]sqlc.Prenda, error) {
-	return s.queries.ListPrendas(ctx)
+func (s *PrendasService) ListPrendasPorUsuario(ctx context.Context, usuarioID int32) ([]sqlc.Prenda, error) {
+	return s.queries.ListarPrendasPorUsuario(ctx, usuarioID)
 }
 
-func (s *PrendasService) GetPrendasByID(ctx context.Context, id int64) (sqlc.Prenda, error) {
+func (s *PrendasService) GetPrendasByID(ctx context.Context, id int32) (sqlc.Prenda, error) {
 	if id <= 0 {
 		return sqlc.Prenda{}, errors.New("ID inválido")
 	}
-	return s.queries.GetPrenda(ctx, id)
+	return s.queries.ObtenerPrenda(ctx, id)
 }
 
-func (s *PrendasService) DeletePrendas(ctx context.Context, id int64) error {
+func (s *PrendasService) DeletePrendas(ctx context.Context, id int32) error {
 	if id <= 0 {
 		return errors.New("ID inválido")
 	}
-	return s.queries.DeletePrenda(ctx, id)
+	return s.queries.EliminarPrenda(ctx, id)
 }
