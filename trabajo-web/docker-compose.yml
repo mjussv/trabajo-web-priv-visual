@@ -12,5 +12,16 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./db/schema:/docker-entrypoint-initdb.d
 
+  app:
+    build: .
+    container_name: app_container
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: "postgres://postgres:mysecretpassword@postgresql:5432/outfits_db?sslmode=disable"
+      PORT: "8080"
+    depends_on:
+      - postgresql
+
 volumes: 
   postgres_data:
