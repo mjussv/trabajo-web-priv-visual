@@ -2,7 +2,6 @@ package logic
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"strings"
 
@@ -34,33 +33,17 @@ func (s *LooksService) CreateLooks(ctx context.Context, params CreateLooksParams
 	if strings.TrimSpace(params.Nombre) == "" {
 		return sqlc.Look{}, errors.New("el nombre del look no puede estar vacío")
 	}
-	if params.UsuarioID <= 0 {
-		return sqlc.Look{}, errors.New("el ID de usuario es obligatorio")
-	}
 
 	return s.queries.CrearLook(ctx, sqlc.CrearLookParams{
-		UsuarioID: params.UsuarioID,
-		Nombre:    params.Nombre,
-		Descripcion: sql.NullString{
-			String: params.Descripcion,
-			Valid:  params.Descripcion != "",
-		},
-		Ocasion:   params.Ocasion,
-		Temporada: params.Temporada,
-		PrendaEstrellaID: sql.NullInt32{
-			Int32: params.PrendaEstrellaID,
-			Valid: params.PrendaEstrellaID > 0,
-		},
-		UrlImagen: params.UrlImagen,
-		Estilo: sql.NullString{
-			String: params.Estilo,
-			Valid:  params.Estilo != "",
-		},
+		UsuarioID:        params.UsuarioID,
+		Nombre:           params.Nombre,
+		Descripcion:      params.Descripcion,
+		Ocasion:          params.Ocasion,
+		Temporada:        params.Temporada,
+		PrendaEstrellaID: params.PrendaEstrellaID,
+		UrlImagen:        params.UrlImagen,
+		Estilo:           params.Estilo,
 	})
-}
-
-func (s *LooksService) ListLooks(ctx context.Context) ([]sqlc.ListarLooksConDetalleRow, error) {
-	return s.queries.ListarLooksConDetalle(ctx)
 }
 
 func (s *LooksService) GetLooksByID(ctx context.Context, id int32) (sqlc.ObtenerLookConDetalleRow, error) {
