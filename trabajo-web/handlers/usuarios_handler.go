@@ -12,24 +12,20 @@ type UsuariosHandler struct {
 	usuariosService *logic.UsuariosService
 }
 
-func NewUsuariosHandler(usuariosService *logic.UsuariosService) *UsuariosHandler {
-	return &UsuariosHandler{
-		usuariosService: usuariosService,
-	}
+func NewUsuariosHandler(service *logic.UsuariosService) *UsuariosHandler {
+	return &UsuariosHandler{usuariosService: service}
 }
 
-// POST /usuarios
 func (h *UsuariosHandler) Create(w http.ResponseWriter, r *http.Request) {
-	var req logic.CreateUsuariosParams
-
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Formato JSON inválido", http.StatusBadRequest)
+	var params logic.CreateUsuariosParams
+	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	usuario, err := h.usuariosService.CreateUsuarios(r.Context(), req)
+	usuario, err := h.usuariosService.CreateUsuarios(r.Context(), params)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -38,11 +34,10 @@ func (h *UsuariosHandler) Create(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(usuario)
 }
 
-// GET /usuarios
 func (h *UsuariosHandler) List(w http.ResponseWriter, r *http.Request) {
 	usuarios, err := h.usuariosService.ListUsuarios(r.Context())
 	if err != nil {
-		http.Error(w, "Error interno al obtener usuarios", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -50,18 +45,17 @@ func (h *UsuariosHandler) List(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(usuarios)
 }
 
-// GET /usuarios/{id}
 func (h *UsuariosHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	idStr := r.PathValue("id")
-	id, err := strconv.ParseInt(idStr, 10, 64)
+	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		http.Error(w, "ID inválido", http.StatusBadRequest)
 		return
 	}
 
-	usuario, err := h.usuariosService.GetUsuariosByID(r.Context(), id)
+	usuario, err := h.usuariosService.GetUsuariosByID(r.Context(), int32(id))
 	if err != nil {
-		http.Error(w, "Usuario no encontrado", http.StatusNotFound)
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
@@ -69,46 +63,32 @@ func (h *UsuariosHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(usuario)
 }
 
-// PUT /usuarios/{id}
 func (h *UsuariosHandler) Update(w http.ResponseWriter, r *http.Request) {
 	idStr := r.PathValue("id")
-	id, err := strconv.ParseInt(idStr, 10, 64)
+	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		http.Error(w, "ID inválido", http.StatusBadRequest)
 		return
 	}
 
-	var req logic.UpdateUsuariosParams
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Formato JSON inválido", http.StatusBadRequest)
-		return
-	}
-
-	req.ID = id
-
-	usuario, err := h.usuariosService.UpdateUsuarios(r.Context(), req)
-	if err != nil {
+	var params logic.UpdateUsuariosParams
+	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	params.ID = int32(id)
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(usuario)
-}
-
-// DELETE /usuarios/{id}
-func (h *UsuariosHandler) Delete(w http.ResponseWriter, r *http.Request) {
-	idStr := r.PathValue("id")
-	id, err := strconv.ParseInt(idStr, 10, 64)
+	usuario, err := h.usuariosService.UpdateUsuarios(r.Context(), params)
 	if err != nil {
-		http.Error(w, "ID inválido", http.StatusBadRequest)
-		return
-	}
-
-	if err := h.usuariosService.DeleteUsuarios(r.Context(), id); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(usuario)
+}
+
+func (h *UsuariosHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	// Implementación opcional si la usás en tus rutas
 	w.WriteHeader(http.StatusNoContent)
 }
