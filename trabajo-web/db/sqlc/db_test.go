@@ -29,14 +29,14 @@ func TestSuiteCompleta(t *testing.T) {
 
 	queries := New(db)
 
-	// se utiliza para generar correo electronico unico dinamicamente para evitar conflictos de duplicados 
+	// Genera correo único dinámicamente para evitar duplicados
 	uniqueEmail := fmt.Sprintf("testuser_%d@example.com", time.Now().UnixNano())
 
 	var usuarioID int32
 	var prendaID int32
 	var lookID int32
 
-	//TEST USUARIO
+	// TEST USUARIOS
 	t.Run("Usuarios_CRUD", func(t *testing.T) {
 		user, err := queries.CrearUsuario(ctx, CrearUsuarioParams{
 			Nombre: "Jane Doe",
@@ -53,7 +53,7 @@ func TestSuiteCompleta(t *testing.T) {
 		}
 	})
 
-	//TEST PRENDAS
+	// TEST PRENDAS
 	t.Run("Prendas_CRUD", func(t *testing.T) {
 		prenda, err := queries.CrearPrenda(ctx, CrearPrendaParams{
 			UsuarioID: usuarioID,
@@ -71,7 +71,7 @@ func TestSuiteCompleta(t *testing.T) {
 		}
 	})
 
-	//  TEST LOOKS 
+	// TEST LOOKS
 	t.Run("Looks_CRUD", func(t *testing.T) {
 		look, err := queries.CrearLook(ctx, CrearLookParams{
 			UsuarioID:        usuarioID,
@@ -94,7 +94,7 @@ func TestSuiteCompleta(t *testing.T) {
 		}
 	})
 
-	//TEST ME GUSTA
+	// TEST ME GUSTA
 	t.Run("MeGusta_Interaccion", func(t *testing.T) {
 		err := queries.DarMeGusta(ctx, DarMeGustaParams{
 			UsuarioID: usuarioID,
@@ -118,7 +118,7 @@ func TestSuiteCompleta(t *testing.T) {
 		}
 	})
 
-	//TEST LIMPIAR CLÓSET
+	// TEST LIMPIAR CLÓSET
 	t.Run("LimpiarCloset", func(t *testing.T) {
 		err := queries.LimpiarClosetPorUsuario(ctx, usuarioID)
 		if err != nil {
