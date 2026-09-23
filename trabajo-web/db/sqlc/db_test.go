@@ -29,7 +29,6 @@ func TestSuiteCompleta(t *testing.T) {
 
 	queries := New(db)
 
-	// Genera correo único dinámicamente para evitar duplicados
 	uniqueEmail := fmt.Sprintf("testuser_%d@example.com", time.Now().UnixNano())
 
 	var usuarioID int32

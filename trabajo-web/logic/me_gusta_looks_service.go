@@ -17,28 +17,28 @@ func NewMeGustaLooksService(queries *sqlc.Queries) *MeGustaLooksService {
 	}
 }
 
-type CreateMeGustaParams struct {
-	UsuarioID int64 `json:"usuario_id"`
-	LookID    int64 `json:"look_id"`
+type MeGustaParams struct {
+	UsuarioID int32 `json:"usuario_id"`
+	LookID    int32 `json:"look_id"`
 }
 
-func (s *MeGustaLooksService) AddMeGusta(ctx context.Context, params CreateMeGustaParams) (sqlc.MeGustaLook, error) {
+func (s *MeGustaLooksService) AddMeGusta(ctx context.Context, params MeGustaParams) error {
 	if params.UsuarioID <= 0 || params.LookID <= 0 {
-		return sqlc.MeGustaLook{}, errors.New("los ID de usuario y look deben ser válidos")
+		return errors.New("los ID de usuario y look deben ser válidos")
 	}
 
-	return s.queries.CreateMeGustaLook(ctx, sqlc.CreateMeGustaLookParams{
+	return s.queries.DarMeGusta(ctx, sqlc.DarMeGustaParams{
 		UsuarioID: params.UsuarioID,
 		LookID:    params.LookID,
 	})
 }
 
-func (s *MeGustaLooksService) DeleteMeGusta(ctx context.Context, params CreateMeGustaParams) error {
+func (s *MeGustaLooksService) DeleteMeGusta(ctx context.Context, params MeGustaParams) error {
 	if params.UsuarioID <= 0 || params.LookID <= 0 {
 		return errors.New("los ID de usuario y look deben ser válidos")
 	}
 
-	return s.queries.DeleteMeGustaLook(ctx, sqlc.DeleteMeGustaLookParams{
+	return s.queries.QuitarMeGusta(ctx, sqlc.QuitarMeGustaParams{
 		UsuarioID: params.UsuarioID,
 		LookID:    params.LookID,
 	})

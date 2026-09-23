@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"strings"
 
@@ -19,38 +20,59 @@ func NewLooksService(queries *sqlc.Queries) *LooksService {
 }
 
 type CreateLooksParams struct {
-	Titulo    string `json:"titulo"`
-	UsuarioID int64  `json:"usuario_id"`
+	UsuarioID        int32  `json:"usuario_id"`
+	Nombre           string `json:"nombre"`
+	Descripcion      string `json:"descripcion"`
+	Ocasion          string `json:"ocasion"`
+	Temporada        string `json:"temporada"`
+	PrendaEstrellaID int32  `json:"prenda_estrella_id"`
+	UrlImagen        string `json:"url_imagen"`
+	Estilo           string `json:"estilo"`
 }
 
 func (s *LooksService) CreateLooks(ctx context.Context, params CreateLooksParams) (sqlc.Look, error) {
-	if strings.TrimSpace(params.Titulo) == "" {
-		return sqlc.Look{}, errors.New("el título del look no puede estar vacío")
+	if strings.TrimSpace(params.Nombre) == "" {
+		return sqlc.Look{}, errors.New("el nombre del look no puede estar vacío")
 	}
 	if params.UsuarioID <= 0 {
 		return sqlc.Look{}, errors.New("el ID de usuario es obligatorio")
 	}
 
-	return s.queries.CreateLook(ctx, sqlc.CreateLookParams{
-		Titulo:    params.Titulo,
+	return s.queries.CrearLook(ctx, sqlc.CrearLookParams{
 		UsuarioID: params.UsuarioID,
+		Nombre:    params.Nombre,
+		Descripcion: sql.NullString{
+			String: params.Descripcion,
+			Valid:  params.Descripcion != "",
+		},
+		Ocasion:   params.Ocasion,
+		Temporada: params.Temporada,
+		PrendaEstrellaID: sql.NullInt32{
+			Int32: params.PrendaEstrellaID,
+			Valid: params.PrendaEstrellaID > 0,
+		},
+		UrlImagen: params.UrlImagen,
+		Estilo: sql.NullString{
+			String: params.Estilo,
+			Valid:  params.Estilo != "",
+		},
 	})
 }
 
-func (s *LooksService) ListLooks(ctx context.Context) ([]sqlc.Look, error) {
-	return s.queries.ListLooks(ctx)
+func (s *LooksService) ListLooks(ctx context.Context) ([]sqlc.ListarLooksConDetalleRow, error) {
+	return s.queries.ListarLooksConDetalle(ctx)
 }
 
-func (s *LooksService) GetLooksByID(ctx context.Context, id int64) (sqlc.Look, error) {
+func (s *LooksService) GetLooksByID(ctx context.Context, id int32) (sqlc.ObtenerLookConDetalleRow, error) {
 	if id <= 0 {
-		return sqlc.Look{}, errors.New("ID inválido")
+		return sqlc.ObtenerLookConDetalleRow{}, errors.New("ID inválido")
 	}
-	return s.queries.GetLook(ctx, id)
+	return s.queries.ObtenerLookConDetalle(ctx, id)
 }
 
-func (s *LooksService) DeleteLooks(ctx context.Context, id int64) error {
+func (s *LooksService) DeleteLooks(ctx context.Context, id int32) error {
 	if id <= 0 {
 		return errors.New("ID inválido")
 	}
-	return s.queries.DeleteLook(ctx, id)
+	return s.queries.EliminarLook(ctx, id)
 }
