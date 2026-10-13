@@ -1,9 +1,8 @@
-# Segunda Entrega:
+# Tercera Entrega:
 
 **Requisitos Previos:**
 
-  Para ejecutar el proyecto y correr el archivo de pruebas es necesario contar con las siguientes herramientas instaladas:
-    Docker (v29.1.3+), Docker Compose (v2.27.0+), Go (v1.22.2+), sqlc (v1.31.1+) y GNU Make (v4.3+)
+  Para ejecutar el proyecto y correr el archivo de pruebas es necesario contar con las herramientas de la segunda entrega.
   
 **Ejecución de Pruebas:**
 
@@ -11,10 +10,13 @@
 
 **Comando de ejecución (desde terminal):**
 
-  " make test "
+  " make test-api "
 
 **A tener en cuenta:**
 
-  Este proyecto implementa la capa de persistencia para una aplicación utilizando Go, PostgreSQL 16 y generación de código SQL seguro mediante sqlc.
-  
-  Si es la primera vez que se descarga sqlc el mismo puede bajarse en el bin de la carpeta "go", lo que podria generar errores; para solucionar esto, utilizar el siguiente comando: " echo 'export PATH=$PATH:~/go/bin'>> ~/.bashrc "
+  La prueba automatizada es la previamente dicha, que se ejecuta con el " make test-api "; si se quisieran verificar las entregas previas: 
+    > La primera entrega requiere que se levante primero el docker y luego ejecutar el main.go, ya que el Makefile se encarga de apagar el primero, los comandos que se deberian ejecutar son los siguientes:
+    " docker compose up -d postgresql "
+    (opcional para verificar que PostgreSQL esté listo y poder ejecutar el main.go: " docker exec postgres_container pg_isready -U postgres -d outfits_db ")
+    " go run main.go "
+    > La segunda entrega solo requiere que se ejecute "make test"
