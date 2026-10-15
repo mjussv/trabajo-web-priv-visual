@@ -1,23 +1,38 @@
-# indica a la herramienta make que "test" es el nombre de una tarea y no el nombre de un archivo 
-.PHONY: test
+# indica a la herramienta make que "test" y "test-api" son tareas y no archivos
+.PHONY: test test-db test-api
 
+# 1. ejecuta todos los tests que encuentre 
 test:
-	# limpia ejec ant
 	docker compose down -v
-
-	# levanta postgres en 2do plano
 	docker compose up -d postgresql
-
-	# espera activamente a que la base de datos outfits_db acepte conexiones
-	@until docker exec postgres_container pg_isready -U postgres -d outfits_db > /dev/null 2>&1; do \
+	@until docker exec postgres_container pg_isready -U postgres -d outfits_db > /dev/null 2>&1 && \
+	       docker exec postgres_container psql -U postgres -d outfits_db -c "SELECT 1;" > /dev/null 2>&1; do \
 		sleep 2; \
 	done
-
-	# generar cod go (a partir de consultas sql)
-	sqlc generate 
-
-	# ejecuta test de go 
+	sqlc generate
 	go test -v ./...
+	docker compose down -v
 
-	# limpia al finalizar
+# 2. ejecuta SOLO la 2da entrega (tests de la BD en db/sqlc)
+test-db:
+	docker compose down -v
+	docker compose up -d postgresql
+	@until docker exec postgres_container pg_isready -U postgres -d outfits_db > /dev/null 2>&1 && \
+	       docker exec postgres_container psql -U postgres -d outfits_db -c "SELECT 1;" > /dev/null 2>&1; do \
+		sleep 2; \
+	done
+	sqlc generate
+	go test -v ./db/sqlc
+	docker compose down -v
+
+# 3. ejecuta SOLO la 3ra entrega (tests de la API en la raíz)
+test-api:
+	docker compose down -v
+	docker compose up -d postgresql
+	@until docker exec postgres_container pg_isready -U postgres -d outfits_db > /dev/null 2>&1 && \
+	       docker exec postgres_container psql -U postgres -d outfits_db -c "SELECT 1;" > /dev/null 2>&1; do \
+		sleep 2; \
+	done
+	sqlc generate
+	go test -v .
 	docker compose down -v
