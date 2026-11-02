@@ -1,0 +1,201 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&family=Playfair+Display:wght@700&display=swap');
+
+:root {
+  --bg-top: #F8E8A2;      /* Amarillo manteca */
+  --text-top: #3C132C;    /* Ciruela oscuro */
+  --bg-bottom: #3C132C;   /* Fondo ciruela */
+  --text-bottom: #F8E8A2; /* Texto manteca */
+  --danger: #d9534f;
+  --like: #e74c3c;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-bottom);
+  color: var(--text-bottom);
+  font-family: 'Montserrat', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 30px 15px;
+}
+
+/* Tarjeta Principal */
+.card {
+  width: 100%;
+  max-width: 650px;
+  background-color: var(--bg-top);
+  color: var(--text-top);
+  border-radius: 20px;
+  padding: 30px 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  text-align: center;
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+  opacity: 0.85;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+label {
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+input {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.btn-primary {
+  padding: 12px;
+  background-color: var(--bg-bottom);
+  color: var(--text-bottom);
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  padding: 10px;
+  background-color: #5a2044;
+  color: var(--text-bottom);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-small {
+  padding: 5px 10px;
+  background-color: transparent;
+  border: 1px solid var(--text-top);
+  color: var(--text-top);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.divider {
+  margin: 20px 0;
+  border: 0;
+  border-top: 1px solid rgba(60, 19, 44, 0.2);
+}
+
+.block-form, .block-lista {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* GRIDA / FEED DE OUTFITS CON FOTO */
+.outfits-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 15px;
+}
+
+.outfit-card {
+  border: 1px solid #eee;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+}
+
+.img-container {
+  width: 100%;
+  height: 250px;
+  background-color: #f4f4f4;
+  overflow: hidden;
+}
+
+.img-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-body {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-body h3 {
+  font-size: 1.1rem;
+  color: var(--text-top);
+}
+
+.card-body .desc {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.details {
+  display: flex;
+  gap: 10px;
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.card-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.btn-like {
+  background-color: #ffe6e6;
+  color: var(--like);
+  border: 1px solid var(--like);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-eliminar {
+  background-color: var(--danger);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.mensaje-alerta {
+  margin-top: 10px;
+  color: #b92c28;
+  text-align: center;
+}

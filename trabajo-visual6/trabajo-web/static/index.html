@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OOTD 🛍️ - Outfit Of The Day</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+
+  <main class="card">
+    
+    <!-- PANTALLA 1: AUTENTICACIÓN (LOGIN / REGISTRO) -->
+    <section id="vista-auth" class="auth-section">
+      <h1>OOTD 🛍️</h1>
+      <p class="subtitle">Ingresá a tu guardarropa digital</p>
+
+      <form id="form-login">
+        <label for="auth-email">Correo Electrónico:</label>
+        <input type="email" id="auth-email" placeholder="tu@email.com" required>
+        
+        <label for="auth-pass">Contraseña:</label>
+        <input type="password" id="auth-pass" placeholder="••••••••" required>
+        
+        <button type="submit" class="btn-primary">Iniciar Sesión</button>
+      </form>
+
+      <div id="mensaje-auth" class="mensaje-alerta"></div>
+      <hr class="divider">
+
+      <form id="form-registro" class="hidden">
+        <h3>Crear Cuenta Nueva</h3>
+        <input type="text" id="reg-nombre" placeholder="Nombre completo" required>
+        <input type="email" id="reg-email" placeholder="Correo electrónico" required>
+        <input type="password" id="reg-pass" placeholder="Crear contraseña" required>
+        <button type="submit" class="btn-secondary">Registrarse</button>
+      </form>
+    </section>
+
+    <!-- PANTALLA 2: APP DE OUTFITS -->
+    <section id="vista-app" class="app-section hidden">
+      <header class="header-app">
+        <h1>OOTD 🛍️</h1>
+        <p id="bienvenida-usuario" class="subtitle"></p>
+        <button id="btn-logout" class="btn-small">Cerrar Sesión</button>
+      </header>
+
+      <!-- Formulario de Nuevo Outfit con URL de foto -->
+      <section class="block-form">
+        <h2>Cargar Nuevo Outfit</h2>
+        <form id="form-outfit">
+          <input type="text" id="nombre" placeholder="Nombre del Look (ej: Night Out)" required>
+          <input type="text" id="descripcion" placeholder="Descripción breve" required>
+          <input type="text" id="ocasion" placeholder="Ocasión (ej: Fiesta, Casual)">
+          <input type="text" id="temporada" placeholder="Temporada (ej: Verano, Invierno)">
+          <input type="url" id="url_imagen" placeholder="URL de la Foto (https://...)" required>
+          <input type="text" id="estilo" placeholder="Estilo (ej: Urbano, Chic)">
+          
+          <button type="submit" class="btn-primary">Publicar Outfit</button>
+        </form>
+      </section>
+
+      <!-- Feed / Guardarropa de Outfits -->
+      <section class="block-lista">
+        <h2>Outfits Guardados</h2>
+        <div id="contenedor-outfits" class="outfits-grid">
+          <!-- JS insertará dinámicamente las tarjetas con imágenes y Me Gusta -->
+        </div>
+      </section>
+    </section>
+
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
