@@ -9,6 +9,17 @@ SELECT * FROM usuarios WHERE id = $1;
 -- name: ListarUsuarios :many
 SELECT * FROM usuarios ORDER BY nombre;
 
+-- name: ActualizarUsuario :one
+UPDATE usuarios
+SET nombre = $2,
+    email = $3
+WHERE id = $1
+RETURNING *;
+
+-- name: EliminarUsuario :exec
+DELETE FROM usuarios WHERE id = $1;
+
+
 -- ===== PRENDAS =====
 
 -- name: CrearPrenda :one
@@ -20,11 +31,20 @@ SELECT * FROM prendas WHERE id = $1;
 -- name: ListarPrendasPorUsuario :many
 SELECT * FROM prendas WHERE usuario_id = $1 ORDER BY nombre;
 
+-- name: ActualizarPrenda :one
+UPDATE prendas
+SET usuario_id = $2,
+    nombre = $3,
+    categoria = $4
+WHERE id = $1
+RETURNING *;
+
 -- name: EliminarPrenda :exec
 DELETE FROM prendas WHERE id = $1;
 
 -- name: LimpiarClosetPorUsuario :exec
 DELETE FROM prendas WHERE usuario_id = $1;
+
 
 -- ===== LOOKS (CRUD principal) =====
 
@@ -90,6 +110,7 @@ RETURNING *;
 
 -- name: EliminarLook :exec
 DELETE FROM looks WHERE id = $1;
+
 
 -- ===== ME GUSTA (like tipo Instagram) =====
 

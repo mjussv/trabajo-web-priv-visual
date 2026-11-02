@@ -1,11 +1,44 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8">
-    <title>OOTD 🛍️</title>
-  </head>
-  <body>
-      <h1>¡Bienvenido a OOTD (Outfit Of The Day)!</h1>
-      <p>Esta página va a permitirle al usuario cargar sus outfits, agregarle una breve descripción al mismo, ver su guardarropa digital, editar un outfit guardado, limpiar su clóset, explorar el guardarropa de otros usuarios, filtrar por usuario y guardar como inspiración outfits de otras personas.</p>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OOTD 🛍️ - Outfit Of The Day</title>
+  <!-- Ruta obligatoria con /static/ para que Go sirva el CSS -->
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+
+  <main class="container">
+    <h1>OOTD 🛍️</h1>
+    <p class="subtitle">Gestiona tus outfits, arma tu guardarropa digital y explora nuevas combinaciones.</p>
+
+    <!-- FORMULARIO COMPLETO CON TODOS SUS CAMPOS -->
+    <section class="card-form">
+      <h2>Agregar Nuevo Outfit</h2>
+      <form id="form-prenda">
+        <input type="number" id="usuario_id" placeholder="ID de Usuario" required>
+        <input type="text" id="nombre" placeholder="Nombre del outfit (ej: Look Verano)" required>
+        <input type="text" id="descripcion" placeholder="Descripción breve" required>
+        <input type="text" id="ocasion" placeholder="Ocasión (ej: Casual, Noche)">
+        <input type="text" id="temporada" placeholder="Temporada (ej: Verano, Invierno)">
+        <input type="url" id="url_imagen" placeholder="URL de la imagen">
+        <input type="text" id="estilo" placeholder="Estilo (ej: Urbano, Elegante)">
+        
+        <button type="submit">Guardar Outfit</button>
+      </form>
+    </section>
+
+    <!-- CONTENEDOR DE LA LISTA DINÁMICA -->
+    <section class="card-lista">
+      <h2>Tu Guardarropa Digital</h2>
+      <ul id="lista-prendas" class="lista-container">
+        <!-- JS generará las tarjetas acá -->
+      </ul>
+    </section>
+  </main>
+
+  <!-- Ruta obligatoria con /static/ para el JavaScript -->
+  <script src="/static/app.js"></script>
+</body>
 </html>
